@@ -35,7 +35,7 @@
 <nav class="navbar navbar-expand-md ov-navbar sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="index.html">
-      <img src="images/logo.png" alt="Overture" class="Overture Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/>
+      <img src="images/logo.png" alt="Overture" class="ov-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/>
       <span style="display:none">Overture</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -43,7 +43,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto align-items-md-stretch">
-        <li class="nav-item">${navLink("index.html", "Watch")}</li>
+        <li class="nav-item">${navLink("/", "Watch")}</li>
         <li class="nav-item">${navLink("about.html", "About")}</li>
         <li class="nav-item">${navLink("contact.html", "Contact")}</li>
         <li class="nav-item">
