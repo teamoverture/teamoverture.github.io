@@ -48,7 +48,7 @@
         <li class="nav-item">${navLink("contact.html", "Contact")}</li>
         <li class="nav-item">
           <a class="nav-link merch-link" href="${MERCH_URL}" target="_blank" rel="noopener">
-            Merch ↗
+            Merch
           </a>
         </li>
       </ul>
