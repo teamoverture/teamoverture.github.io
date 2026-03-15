@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Team Overture — Twitch Player</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --p: #9146FF; --p2: #772ce8; --dark: #0e0e10; --surf: #18181b;
+    --card: #1f1f23; --brd: #2a2a2e; --txt: #efeff1; --mut: #adadb8;
+  }
+  html, body { height: 100%; background: var(--dark); }
+  body { color: var(--txt); font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; }
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* Header */
+  #hdr { background: var(--surf); border-bottom: 1px solid var(--brd); padding: 9px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  #hdr svg { width: 22px; height: 22px; fill: var(--p); flex-shrink: 0; }
+  #hdr-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: .4px; }
+
+  /* Body */
+  #body { display: grid; grid-template-columns: 1fr 260px; flex: 1; min-height: 0; }
+
+  /* Left / player */
+  #left { background: #000; display: flex; flex-direction: column; min-height: 0; }
+  #player-area { flex: 1; position: relative; min-height: 0; }
+  #player-area iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+  #splash { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: var(--dark); }
+  #splash svg { width: 56px; height: 56px; fill: var(--p); opacity: .35; }
+  #splash p { color: var(--mut); font-size: 14px; text-align: center; max-width: 200px; line-height: 1.6; }
+
+  /* Now playing bar */
+  #nowbar { background: var(--surf); border-top: 1px solid var(--brd); padding: 10px 14px; display: none; align-items: center; gap: 10px; flex-shrink: 0; }
+  #np-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; }
+  #np-sub a { font-size: 12px; color: var(--p); text-decoration: none; }
+  #np-sub a:hover { text-decoration: underline; }
+
+  /* Sidebar */
+  #sidebar { background: var(--surf); border-left: 1px solid var(--brd); display: flex; flex-direction: column; overflow: hidden; }
+  #sb-hdr { padding: 10px 14px; border-bottom: 1px solid var(--brd); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1.2px; color: var(--mut); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  #sb-count { color: var(--p); font-size: 11px; }
+  #ch-list { overflow-y: auto; flex: 1; }
+  #ch-list::-webkit-scrollbar { width: 3px; }
+  #ch-list::-webkit-scrollbar-thumb { background: var(--brd); border-radius: 2px; }
+  .ch { padding: 10px 14px; display: flex; align-items: center; cursor: pointer; border-bottom: .5px solid var(--brd); transition: background .12s; }
+  .ch:hover { background: var(--card); }
+  .ch.active { background: rgba(145, 70, 255, .14); border-left: 2px solid var(--p); }
+  .ci { flex: 1; min-width: 0; }
+  .cn { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cs a { font-size: 11px; color: var(--p); text-decoration: none; }
+  .cs a:hover { text-decoration: underline; }
+  #sb-footer { padding: 8px 14px; border-top: 1px solid var(--brd); font-size: 11px; color: var(--mut); text-align: center; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hdr">
+    <svg viewBox="0 0 24 24"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43z"/></svg>
+    <span id="hdr-title">Team Overture</span>
+  </div>
+  <div id="body">
+    <div id="left">
+      <div id="player-area">
+        <div id="splash">
+          <svg viewBox="0 0 24 24"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43z"/></svg>
+          <p>Select a channel from the roster to start watching</p>
+        </div>
+      </div>
+      <div id="nowbar">
+        <div>
+          <div id="np-name"></div>
+          <div id="np-sub"><a id="np-link" href="#" target="_blank"></a></div>
+        </div>
+      </div>
+    </div>
+    <div id="sidebar">
+      <div id="sb-hdr">Roster <span id="sb-count">0</span></div>
+      <div id="ch-list"></div>
+      <div id="sb-footer">Click a channel to watch</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── EDIT ROSTER HERE ─────────────────────────────────────────────────────────
+const ROSTER = [
+  "polygonprincess",
+  "haibobby"
+];
+// For custom display names use objects:
+// { "login": "actualusername", "display": "Display Name" }
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── SET YOUR DOMAIN HERE (e.g. "mysite.com" or "localhost") ─────────────────
+const PARENT_DOMAIN = "github.io";
+// ─────────────────────────────────────────────────────────────────────────────
+
+const chList = document.getElementById('ch-list');
+const sbCount = document.getElementById('sb-count');
+const playerArea = document.getElementById('player-area');
+const splash = document.getElementById('splash');
+const nowbar = document.getElementById('nowbar');
+const npName = document.getElementById('np-name');
+const npLink = document.getElementById('np-link');
+
+const channels = ROSTER.map(item =>
+  typeof item === 'string'
+    ? { login: item.trim().toLowerCase(), display: item.trim() }
+    : { login: String(item.login).trim().toLowerCase(), display: String(item.display || item.login).trim() }
+);
+
+let active = null;
+let playerFrame = null;
+
+function tuneIn(login, display) {
+  active = login;
+  splash.style.display = 'none';
+  nowbar.style.display = 'flex';
+  npName.textContent = display;
+  npLink.textContent = `twitch.tv/${login}`;
+  npLink.href = `https://www.twitch.tv/${login}`;
+  if (playerFrame) playerFrame.remove();
+  playerFrame = document.createElement('iframe');
+  playerFrame.src = `https://player.twitch.tv/?channel=${login}&parent=${PARENT_DOMAIN}&autoplay=true`;
+  playerFrame.allowFullscreen = true;
+  playerFrame.allow = 'autoplay; fullscreen';
+  playerArea.appendChild(playerFrame);
+  render();
+}
+
+function render() {
+  sbCount.textContent = channels.length;
+  chList.innerHTML = '';
+  channels.forEach(ch => {
+    const el = document.createElement('div');
+    el.className = 'ch' + (ch.login === active ? ' active' : '');
+    el.innerHTML = `<div class="ci"><div class="cn">${ch.display}</div><div class="cs"><a href="https://www.twitch.tv/${ch.login}" target="_blank">twitch.tv/${ch.login}</a></div></div>`;
+    el.addEventListener('click', e => {
+      if (e.target.tagName === 'A') return;
+      tuneIn(ch.login, ch.display);
+    });
+    chList.appendChild(el);
+  });
+}
+
+render();
+if (channels.length) tuneIn(channels[0].login, channels[0].display);
+</script>
+</body>
+</html>
