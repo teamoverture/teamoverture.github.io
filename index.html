@@ -134,7 +134,7 @@
       active = login;
       if (playerFrame) playerFrame.remove();
       playerFrame = document.createElement('iframe');
-      playerFrame.src = `https://player.twitch.tv/?channel=${login}&parent=${PARENT_DOMAIN}&muted=true`;
+      playerFrame.src = `https://player.twitch.tv/?channel=${login}&parent=${PARENT_DOMAIN}&autoplay=true&muted=false`;
       playerFrame.width = 1280;
       playerFrame.height = 720;
       playerArea.appendChild(playerFrame);
