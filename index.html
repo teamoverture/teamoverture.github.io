@@ -134,9 +134,7 @@
       active = login;
       if (playerFrame) playerFrame.remove();
       playerFrame = document.createElement('iframe');
-      playerFrame.src = `https://player.twitch.tv/?channel=${login}&parent=${PARENT_DOMAIN}&autoplay=true`;
-      playerFrame.allowFullscreen = true;
-      playerFrame.allow = 'autoplay; fullscreen';
+      playerFrame.src = `https://player.twitch.tv/?channel=${login}&parent=${PARENT_DOMAIN}&autoplay=true&muted=true`;
       playerArea.appendChild(playerFrame);
       render();
     }
