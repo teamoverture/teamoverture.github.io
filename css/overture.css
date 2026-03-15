@@ -35,7 +35,7 @@ html, body {
   align-items: center;
   gap: 9px;
 }
-/* Logo image — adjust max-height to suit your logo */
+/* Logo image */
 .ov-logo {
   max-height: 36px;
   width: auto;
@@ -126,6 +126,8 @@ html, body {
   color: var(--mut);
   opacity: .7;
   transition: opacity .15s;
+  width:18px;
+  height:18px;
 }
 .ov-footer-icon:hover { opacity: 1; }
 
