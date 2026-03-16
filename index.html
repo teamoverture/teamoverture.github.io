@@ -17,6 +17,7 @@
     #player-col { background: #000; display: flex; flex-direction: column; flex: 1; min-width: 0; }
     #player-area { flex: 1; position: relative; min-height: 0; }
     #player-area iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
 
     /* Sidebar */
@@ -76,6 +77,9 @@
         </div>
         <div id="ch-list"></div>
         <div id="no-results">No channels match your search</div>
+        <div id="sb-notice" style="padding:8px 12px;border-top:1px solid var(--brd);font-size:10px;color:var(--mut);line-height:1.5;flex-shrink:0;display:none;">
+			    Live status may be inaccurate due to third-party API limitations.
+        </div>
       </div>
     </div>
   </div>
@@ -142,7 +146,10 @@
     const sortLabel  = document.getElementById('sort-label');
     const chList     = document.getElementById('ch-list');
     const noResults  = document.getElementById('no-results');
+    const sbNotice   = document.getElementById('sb-notice');
     const playerArea = document.getElementById('player-area');
+
+    let liveChecksComplete = false;
 
     // Returns baseOrder with live channels floated to top
     function getOrdered() {
@@ -150,12 +157,38 @@
       const offline = baseOrder.filter(ch => !liveSet.has(ch.login));
       return [...live, ...offline];
     }
-    
+
     function getVisible() {
       const q = filterText.toLowerCase();
       return getOrdered().filter(ch =>
         ch.display.toLowerCase().includes(q) || ch.login.includes(q)
       );
+    }
+
+    function showSidebarLoading() {
+      chList.innerHTML = `
+        <div style="padding:32px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:22px;height:22px;border:2px solid var(--brd);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;"></div>
+          <span style="color:var(--mut);font-size:12px;">Checking who's live…</span>
+        </div>`;
+    }
+
+    function render() {
+      // Show loading skeleton until first live check is done
+      if (!liveChecksComplete) { showSidebarLoading(); return; }
+      const visible = getVisible();
+      chList.innerHTML = '';
+      noResults.style.display = visible.length === 0 ? 'block' : 'none';
+      sbNotice.style.display = 'block';
+      visible.forEach(ch => {
+        const isLive = liveSet.has(ch.login);
+        const el = document.createElement('div');
+        el.className = 'ch' + (ch.login === active ? ' active' : '');
+        const badge = isLive ? `<span class="live-badge">LIVE</span>` : '';
+        el.innerHTML = `<div class="ci"><div class="cn-row"><span class="cn">${ch.display}</span>${badge}</div><div class="cs"><a href="https://www.twitch.tv/${ch.login}" target="_blank">twitch.tv/${ch.login}</a></div></div>`;
+        el.addEventListener('click', e => { if (e.target.tagName === 'A') return; tuneIn(ch.login, ch.display); });
+        chList.appendChild(el);
+      });
     }
 
     function render() {
@@ -186,25 +219,39 @@
       render();
     }
 
-    function pickChannel() {
-      // If teamoverture is live, always pick it first
-      if (liveSet.has(DEFAULT_CHANNEL.login)) return DEFAULT_CHANNEL;
-      // Otherwise pick a random live channel
-      const liveChannels = allChannels.filter(ch => liveSet.has(ch.login));
-      if (liveChannels.length) return liveChannels[Math.floor(Math.random() * liveChannels.length)];
-      // Nobody live — fall back to teamoverture
-      return DEFAULT_CHANNEL;
+    function showNobodyLive() {
+      if (playerFrame) { playerFrame.remove(); playerFrame = null; }
+      active = null;
+      playerArea.innerHTML = `
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--dark);padding:2rem;text-align:center;">
+          <p style="color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;margin:0;">Looks like no one is live right now.</p>
+          <p style="color:var(--mut);font-size:.875rem;margin:0;max-width:280px;line-height:1.6;">Be on the lookout! Browse through our creators on the right to check out their schedules and catch them next time.</p>
+          <div style="display:flex;align-items:center;gap:16px;margin-top:4px;">
+            <a href="https://twitch.tv/team/overture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/twitch.svg" alt="Twitch" style="width:22px;height:22px;"/></a>
+            <a href="https://x.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/twitter.svg" alt="X / Twitter" style="width:22px;height:22px;"/></a>
+            <a href="https://discord.gg/mnuBB3BCP5" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/discord.svg" alt="Discord" style="width:22px;height:22px;"/></a>
+            <a href="https://www.instagram.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/instagram.svg" alt="Instagram" style="width:22px;height:22px;"/></a>
+            <a href="https://bsky.app/profile/teamoverture.bsky.social" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/bluesky.svg" alt="Bluesky" style="width:22px;height:22px;"/></a>
+          </div>
+        </div>`;
     }
 
-    // Show a loading state in the player area
     function showPlayerLoading() {
       playerArea.innerHTML = `
         <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--dark);">
           <div style="width:32px;height:32px;border:2px solid var(--brd);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;"></div>
           <p style="color:var(--mut);font-size:13px;margin:0;">Checking who's live…</p>
-        </div>
-        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-      `;
+        </div>`;
+    }
+
+    function pickChannel() {
+      // teamoverture always takes priority if live
+      if (liveSet.has(DEFAULT_CHANNEL.login)) return DEFAULT_CHANNEL;
+      // Otherwise pick a random live channel
+      const liveChannels = allChannels.filter(ch => liveSet.has(ch.login));
+      if (liveChannels.length) return liveChannels[Math.floor(Math.random() * liveChannels.length)];
+      // Nobody live
+      return null;
     }
 
     function cycleSort() {
@@ -240,11 +287,15 @@
         await new Promise(r => setTimeout(r, 100));
       }
       liveSet = newLive;
+      liveChecksComplete = true;
       render();
-      // On first load, pick the best channel to tune into after checks complete
       if (initialLoad) {
         const ch = pickChannel();
-        tuneIn(ch.login, ch.display);
+        if (ch) {
+          tuneIn(ch.login, ch.display);
+        } else {
+          showNobodyLive();
+        }
       }
     }
 
@@ -258,9 +309,8 @@
             : { login: String(item.login).trim().toLowerCase(), display: String(item.display || item.login).trim() }
         );
         baseOrder = shuffle(allChannels);
-        render();
+        render(); // shows sidebar loading state
         showPlayerLoading();
-        // Initial live check loads the player once done, then repeat on interval
         checkLiveStatuses(true);
         setInterval(() => checkLiveStatuses(false), REFRESH_INTERVAL);
       })
