@@ -78,13 +78,42 @@
   </div>
   <div id="ov-footer"></div>
 
+  <!-- Adblocker warning modal -->
+  <div class="modal fade" id="adblockModal" tabindex="-1" aria-labelledby="adblockModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background:var(--surf);border:1px solid var(--brd);border-radius:8px;">
+        <div class="modal-header" style="border-bottom:1px solid var(--brd);padding:1rem 1.25rem;">
+          <h5 class="modal-title" id="adblockModalLabel" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.3px;">
+            Heads up about the video player
+          </h5>
+        </div>
+        <div class="modal-body" style="padding:1.25rem;font-size:.9rem;line-height:1.7;color:var(--mut);">
+          <p style="margin-bottom:.75rem;">If the video player isn't loading, it may be due to an <strong style="color:var(--txt)">ad blocker or enhanced tracking protection</strong> in your browser.</p>
+          <p style="margin-bottom:.75rem;">This is a known limitation of embedding the Twitch player directly onto our site - Twitch's player can be blocked by certain privacy tools and browser extensions.</p>
+          <p style="margin:0;">To fix this, try <strong style="color:var(--txt)">disabling your ad blocker</strong> for this page, or watch directly on <a href="https://twitch.tv/team/overture" target="_blank" rel="noopener" style="color:var(--p);">twitch.tv/team/overture</a>.</p>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid var(--brd);padding:.75rem 1.25rem;">
+          <button type="button" class="btn btn-sm" id="adblockDismiss" style="background:var(--p);color:#fff;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.5px;padding:6px 18px;border-radius:4px;">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/layout.js"></script>
   <script>
-    // ─── GITHUB PAGES DOMAIN ─────────────────────────────────
+    // Show adblocker warning once per session
+    if (!sessionStorage.getItem('adblockDismissed')) {
+      const modal = new bootstrap.Modal(document.getElementById('adblockModal'), { backdrop: 'static', keyboard: false });
+      modal.show();
+      document.getElementById('adblockDismiss').addEventListener('click', () => {
+        sessionStorage.setItem('adblockDismissed', '1');
+        modal.hide();
+      });
+    }
+  </script>
+  <script>
     const PARENT_DOMAIN = "teamoverture.github.io";
-
-    // ─── DEFAULT CHANNEL (loaded on page open) ────────────────────
     const DEFAULT_CHANNEL = { login: "teamoverture", display: "teamoverture" };
 
     function shuffle(arr) {
