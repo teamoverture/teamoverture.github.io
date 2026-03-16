@@ -47,9 +47,9 @@
     #sb-footer { padding: 8px 14px; border-top: 1px solid var(--brd); font-size: 11px; color: var(--mut); text-align: center; flex-shrink: 0; }
 
     @media (max-width: 767px) {
-      body { overflow: auto; height: auto; }
-      #streams-body { flex-direction: column; }
-      #sidebar { width: 100%; border-left: none; border-top: 1px solid var(--brd); max-height: 360px; }
+      body { overflow: auto; height: 100vh; }
+      #streams-body { flex-direction: column; flex: 1; min-height: 0; }
+      #sidebar { width: 100%; border-left: none; border-top: 1px solid var(--brd); max-height: 360px; flex: 1; min-height: 0; }
       #player-area { min-height: 240px; }
     }
   </style>
