@@ -65,4 +65,36 @@
 
   document.getElementById("ov-navbar").innerHTML = navbar;
   document.getElementById("ov-footer").innerHTML = footer;
+
+  // Load and render alert banner
+  const alertPath = location.pathname.includes('/') 
+    ? location.pathname.replace(/\/[^/]*$/, '/') + 'alert.json'
+    : 'alert.json';
+  fetch(alertPath)
+    .then(r => r.json())
+    .then(alert => {
+      if (!alert.enabled) return;
+      const dismissed = sessionStorage.getItem('alertDismissed');
+      // Use message content as key so new alerts show even if a previous one was dismissed
+      const key = btoa(alert.message).slice(0, 16);
+      if (dismissed === key) return;
+      const bar = document.createElement('div');
+      bar.id = 'ov-alert';
+      bar.style.cssText = 'background:var(--p);color:#fff;font-family:"Barlow",sans-serif;font-size:.875rem;padding:8px 16px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;flex-shrink:0;';
+      const link = alert.link && alert.link.url
+        ? `<a href="${alert.link.url}" target="_blank" rel="noopener" style="color:#fff;font-weight:600;text-decoration:underline;white-space:nowrap;">${alert.link.text} ↗</a>`
+        : '';
+      bar.innerHTML = `
+        <span style="text-align:center;">${alert.message}${link ? '&ensp;' + link : ''}</span>
+        <button id="alert-close" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;cursor:pointer;font-size:1.1rem;opacity:.8;line-height:1;padding:4px;" title="Dismiss">&times;</button>
+      `;
+      // Insert before navbar
+      const navbar = document.getElementById('ov-navbar');
+      navbar.insertAdjacentElement('beforebegin', bar);
+      document.getElementById('alert-close').addEventListener('click', () => {
+        bar.remove();
+        sessionStorage.setItem('alertDismissed', key);
+      });
+    })
+    .catch(() => {}); // Silently fail if alert.json is missing
 })();
