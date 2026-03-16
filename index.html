@@ -191,23 +191,6 @@
       });
     }
 
-    function render() {
-      const visible = getVisible();
-      chList.innerHTML = '';
-      noResults.style.display = visible.length === 0 ? 'block' : 'none';
-      visible.forEach(ch => {
-        const isLive = liveSet.has(ch.login);
-        const el = document.createElement('div');
-        el.className = 'ch' + (ch.login === active ? ' active' : '');
-        const badge = isLive
-          ? `<span class="live-badge">LIVE</span>`
-          : '';
-        el.innerHTML = `<div class="ci"><div class="cn-row"><span class="cn">${ch.display}</span>${badge}</div><div class="cs"><a href="https://www.twitch.tv/${ch.login}" target="_blank">twitch.tv/${ch.login}</a></div></div>`;
-        el.addEventListener('click', e => { if (e.target.tagName === 'A') return; tuneIn(ch.login, ch.display); });
-        chList.appendChild(el);
-      });
-    }
-
     function tuneIn(login, display) {
       active = login;
       if (playerFrame) playerFrame.remove();
@@ -228,10 +211,10 @@
           <p style="color:var(--mut);font-size:.875rem;margin:0;max-width:280px;line-height:1.6;">Be on the lookout! Browse through our creators on the right to check out their schedules and catch them next time.</p>
           <div style="display:flex;align-items:center;gap:16px;margin-top:4px;">
             <a href="https://twitch.tv/team/overture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/twitch.svg" alt="Twitch" style="width:22px;height:22px;"/></a>
-            <a href="https://x.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/twitter.svg" alt="X / Twitter" style="width:22px;height:22px;"/></a>
             <a href="https://discord.gg/mnuBB3BCP5" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/discord.svg" alt="Discord" style="width:22px;height:22px;"/></a>
-            <a href="https://www.instagram.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/instagram.svg" alt="Instagram" style="width:22px;height:22px;"/></a>
             <a href="https://bsky.app/profile/teamoverture.bsky.social" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/bluesky.svg" alt="Bluesky" style="width:22px;height:22px;"/></a>
+            <a href="https://www.instagram.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/instagram.svg" alt="Instagram" style="width:22px;height:22px;"/></a>
+            <a href="https://x.com/teamoverture" target="_blank" rel="noopener" style="opacity:.6;transition:opacity .15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><img src="images/socials/twitter.svg" alt="X / Twitter" style="width:22px;height:22px;"/></a>
           </div>
         </div>`;
     }
