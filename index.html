@@ -254,22 +254,23 @@
     sortBtn.addEventListener('click', cycleSort);
     searchEl.addEventListener('input', () => { filterText = searchEl.value; render(); });
 
-    // Check live status for all channels via decapi.me
-    // Requests are staggered 100ms apart to be respectful to the API
+    // Cloudflare worker url
+    const WORKER_URL = "https://overture-twitch-status.overturecreators.workers.dev";
+
+    // Check live status for all channels via Cloudflare Worker
     async function checkLiveStatuses(initialLoad = false) {
-      const newLive = new Set();
-      for (let i = 0; i < allChannels.length; i++) {
-        const ch = allChannels[i];
-        try {
-          const res = await fetch(`https://decapi.me/twitch/uptime/${ch.login}`);
-          const text = await res.text();
-          if (!text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error') && text.trim() !== '') {
-            newLive.add(ch.login);
-          }
-        } catch (e) { /* silently skip on network error */ }
-        await new Promise(r => setTimeout(r, 100));
+      try {
+        const logins = allChannels.map(ch => ch.login).join(",");
+        const res = await fetch(`${WORKER_URL}?logins=${logins}`);
+        const data = await res.json();
+        const newLive = new Set();
+        Object.entries(data).forEach(([login, isLive]) => {
+          if (isLive) newLive.add(login);
+        });
+        liveSet = newLive;
+      } catch (e) {
+        console.warn("Live status check failed:", e);
       }
-      liveSet = newLive;
       liveChecksComplete = true;
       render();
       if (initialLoad) {
