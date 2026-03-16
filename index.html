@@ -130,8 +130,9 @@
     }
 
     let allChannels = [];
+    let liveSet = new Set();
     let sortMode = null;
-    let displayOrder = [];
+    let baseOrder = []; // shuffle/sort order before live promotion
     let filterText = '';
     let active = null;
     let playerFrame = null;
