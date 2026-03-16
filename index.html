@@ -186,6 +186,27 @@
       render();
     }
 
+    function pickChannel() {
+      // If teamoverture is live, always pick it first
+      if (liveSet.has(DEFAULT_CHANNEL.login)) return DEFAULT_CHANNEL;
+      // Otherwise pick a random live channel
+      const liveChannels = allChannels.filter(ch => liveSet.has(ch.login));
+      if (liveChannels.length) return liveChannels[Math.floor(Math.random() * liveChannels.length)];
+      // Nobody live — fall back to teamoverture
+      return DEFAULT_CHANNEL;
+    }
+
+    // Show a loading state in the player area
+    function showPlayerLoading() {
+      playerArea.innerHTML = `
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--dark);">
+          <div style="width:32px;height:32px;border:2px solid var(--brd);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;"></div>
+          <p style="color:var(--mut);font-size:13px;margin:0;">Checking who's live…</p>
+        </div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      `;
+    }
+
     function cycleSort() {
       if (sortMode === null || sortMode === 'desc') {
         sortMode = 'asc';
@@ -205,25 +226,28 @@
 
     // Check live status for all channels via decapi.me
     // Requests are staggered 100ms apart to be respectful to the API
-    async function checkLiveStatuses() {
+    async function checkLiveStatuses(initialLoad = false) {
       const newLive = new Set();
       for (let i = 0; i < allChannels.length; i++) {
         const ch = allChannels[i];
         try {
           const res = await fetch(`https://decapi.me/twitch/uptime/${ch.login}`);
           const text = await res.text();
-          // decapi returns "X hours, Y minutes, Z seconds" if live, or an offline message if not
           if (!text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error') && text.trim() !== '') {
             newLive.add(ch.login);
           }
         } catch (e) { /* silently skip on network error */ }
-        // Stagger requests by 100ms
         await new Promise(r => setTimeout(r, 100));
       }
       liveSet = newLive;
       render();
+      // On first load, pick the best channel to tune into after checks complete
+      if (initialLoad) {
+        const ch = pickChannel();
+        tuneIn(ch.login, ch.display);
+      }
     }
-    
+
     // Load roster from creators.json then boot
     fetch('creators.json')
       .then(r => r.json())
@@ -235,10 +259,10 @@
         );
         baseOrder = shuffle(allChannels);
         render();
-        tuneIn(DEFAULT_CHANNEL.login, DEFAULT_CHANNEL.display);
-        // Initial live check then repeat on interval
-        checkLiveStatuses();
-        setInterval(checkLiveStatuses, REFRESH_INTERVAL);
+        showPlayerLoading();
+        // Initial live check loads the player once done, then repeat on interval
+        checkLiveStatuses(true);
+        setInterval(() => checkLiveStatuses(false), REFRESH_INTERVAL);
       })
       .catch(err => {
         console.error('Failed to load creators.json:', err);
