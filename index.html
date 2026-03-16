@@ -40,11 +40,14 @@
     .ch:hover { background: var(--card); }
     .ch.active { background: rgba(145,70,255,.14); border-left: 2px solid var(--p); }
     .ci { flex: 1; min-width: 0; }
+    .cn-row { display: flex; align-items: center; gap: 6px; }
     .cn { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .live-badge { flex-shrink: 0; background: #eb0400; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: .8px; padding: 1px 5px; border-radius: 2px; }
     .cs a { font-size: 11px; color: var(--p); text-decoration: none; }
     .cs a:hover { text-decoration: underline; }
     #no-results { padding: 20px 14px; text-align: center; color: var(--mut); font-size: 12px; display: none; }
     #sb-footer { padding: 8px 14px; border-top: 1px solid var(--brd); font-size: 11px; color: var(--mut); text-align: center; flex-shrink: 0; }
+
 
     @media (max-width: 767px) {
       body { overflow: auto; height: 100vh; }
@@ -115,7 +118,8 @@
   <script>
     const PARENT_DOMAIN = "teamoverture.github.io";
     const DEFAULT_CHANNEL = { login: "teamoverture", display: "teamoverture" };
-
+    const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+    
     function shuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -139,9 +143,16 @@
     const noResults  = document.getElementById('no-results');
     const playerArea = document.getElementById('player-area');
 
+    // Returns baseOrder with live channels floated to top
+    function getOrdered() {
+      const live = baseOrder.filter(ch => liveSet.has(ch.login));
+      const offline = baseOrder.filter(ch => !liveSet.has(ch.login));
+      return [...live, ...offline];
+    }
+    
     function getVisible() {
       const q = filterText.toLowerCase();
-      return displayOrder.filter(ch =>
+      return getOrdered().filter(ch =>
         ch.display.toLowerCase().includes(q) || ch.login.includes(q)
       );
     }
@@ -151,9 +162,13 @@
       chList.innerHTML = '';
       noResults.style.display = visible.length === 0 ? 'block' : 'none';
       visible.forEach(ch => {
+        const isLive = liveSet.has(ch.login);
         const el = document.createElement('div');
         el.className = 'ch' + (ch.login === active ? ' active' : '');
-        el.innerHTML = `<div class="ci"><div class="cn">${ch.display}</div><div class="cs"><a href="https://www.twitch.tv/${ch.login}" target="_blank">twitch.tv/${ch.login}</a></div></div>`;
+        const badge = isLive
+          ? `<span class="live-badge">LIVE</span>`
+          : '';
+        el.innerHTML = `<div class="ci"><div class="cn-row"><span class="cn">${ch.display}</span>${badge}</div><div class="cs"><a href="https://www.twitch.tv/${ch.login}" target="_blank">twitch.tv/${ch.login}</a></div></div>`;
         el.addEventListener('click', e => { if (e.target.tagName === 'A') return; tuneIn(ch.login, ch.display); });
         chList.appendChild(el);
       });
@@ -173,12 +188,12 @@
     function cycleSort() {
       if (sortMode === null || sortMode === 'desc') {
         sortMode = 'asc';
-        displayOrder = [...allChannels].sort((a, b) => a.display.localeCompare(b.display));
+        baseOrder = [...allChannels].sort((a, b) => a.display.localeCompare(b.display));
         sortLabel.textContent = 'A–Z';
         sortBtn.classList.add('active');
       } else {
         sortMode = 'desc';
-        displayOrder = [...allChannels].sort((a, b) => b.display.localeCompare(a.display));
+        baseOrder = [...allChannels].sort((a, b) => b.display.localeCompare(a.display));
         sortLabel.textContent = 'Z–A';
       }
       render();
@@ -187,6 +202,27 @@
     sortBtn.addEventListener('click', cycleSort);
     searchEl.addEventListener('input', () => { filterText = searchEl.value; render(); });
 
+    // Check live status for all channels via decapi.me
+    // Requests are staggered 100ms apart to be respectful to the API
+    async function checkLiveStatuses() {
+      const newLive = new Set();
+      for (let i = 0; i < allChannels.length; i++) {
+        const ch = allChannels[i];
+        try {
+          const res = await fetch(`https://decapi.me/twitch/uptime/${ch.login}`);
+          const text = await res.text();
+          // decapi returns "X hours, Y minutes, Z seconds" if live, or an offline message if not
+          if (!text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error') && text.trim() !== '') {
+            newLive.add(ch.login);
+          }
+        } catch (e) { /* silently skip on network error */ }
+        // Stagger requests by 100ms
+        await new Promise(r => setTimeout(r, 100));
+      }
+      liveSet = newLive;
+      render();
+    }
+    
     // Load roster from creators.json then boot
     fetch('creators.json')
       .then(r => r.json())
@@ -196,9 +232,12 @@
             ? { login: item.trim().toLowerCase(), display: item.trim() }
             : { login: String(item.login).trim().toLowerCase(), display: String(item.display || item.login).trim() }
         );
-        displayOrder = shuffle(allChannels);
+        baseOrder = shuffle(allChannels);
         render();
         tuneIn(DEFAULT_CHANNEL.login, DEFAULT_CHANNEL.display);
+        // Initial live check then repeat on interval
+        checkLiveStatuses();
+        setInterval(checkLiveStatuses, REFRESH_INTERVAL);
       })
       .catch(err => {
         console.error('Failed to load creators.json:', err);
