@@ -33,7 +33,7 @@
   const navbar = `
 <nav class="navbar navbar-expand-md ov-navbar sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="index.html">
+    <a class="navbar-brand" href="/">
       <img src="images/logo.png" alt="Overture" class="ov-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/>
       <span style="display:none">Overture</span>
     </a>
