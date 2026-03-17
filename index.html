@@ -31,6 +31,9 @@
     #sort-btn { flex-shrink: 0; background: var(--card); border: 1px solid var(--brd); color: var(--mut); border-radius: 4px; padding: 5px 8px; cursor: pointer; font-size: 13px; line-height: 1; transition: border-color .15s, color .15s; display: flex; align-items: center; gap: 4px; }
     #sort-btn:hover { border-color: var(--p); color: var(--txt); }
     #sort-btn.active { border-color: var(--p); color: var(--p); }
+    #sort-icon { display: block; width: 13px; height: 13px; background-color: var(--mut); -webkit-mask-image: url('images/sort-icon.svg'); mask-image: url('images/sort-icon.svg'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; transition: background-color .15s; }
+    #sort-btn:hover #sort-icon { background-color: var(--txt); }
+    #sort-btn.active #sort-icon { background-color: var(--p); }
     #sort-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .5px; }
 
 
@@ -69,9 +72,7 @@
         <div id="sb-controls">
           <input id="sb-search" type="text" placeholder="Search creators..." autocomplete="off"/>
           <button id="sort-btn" title="Sort alphabetically">
-            <svg id="sort-icon" viewBox="0 0 16 16" width="13" height="13" fill="currentColor">
-              <path d="M2 4h12v1.5H2zm2 3h8v1.5H4zm2 3h4v1.5H6z"/>
-            </svg>
+            <span id="sort-icon"></span>
             <span id="sort-label">A–Z</span>
           </button>
         </div>
