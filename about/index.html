@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Learn about Team Overture — a diverse group of content creators raising money for non-profits and doing cool shit."/>
+  <title>About | Overture</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png"/>
+  <link rel="shortcut icon" href="/images/favicon.ico"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/css/overture.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--mut);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--brd);
+    }
+    .mission-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--txt);
+    }
+    .mission-text p { margin-bottom: 1rem; }
+    .mission-text p:last-child { margin-bottom: 0; }
+
+    /* Charity cards */
+    .charity-card {
+      background: var(--card);
+      border: 1px solid var(--brd);
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      height: 100%;
+      transition: border-color .15s;
+    }
+    .charity-card:hover { border-color: var(--p); }
+    .charity-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: .25rem;
+    }
+    .charity-raised {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: .5px;
+      color: var(--p);
+      background: rgba(145,70,255,.12);
+      border: 1px solid rgba(145,70,255,.25);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: .6rem;
+    }
+    .charity-desc {
+      font-size: .85rem;
+      color: var(--mut);
+      line-height: 1.6;
+      margin-bottom: .75rem;
+    }
+    .charity-link a {
+      font-size: .82rem;
+      color: var(--p);
+      text-decoration: none;
+    }
+    .charity-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="ov-navbar"></div>
+
+  <div class="ov-hero">
+    <div class="container-fluid px-4">
+      <h1>About <span class="accent">Overture</span></h1>
+      <p>We do cool shit.</p>
+    </div>
+  </div>
+
+  <main class="container-fluid px-4 py-4 flex-grow-1">
+
+    <!-- Mission -->
+    <div class="row mb-5">
+      <div class="col-lg-8">
+        <p class="section-label">Our mission</p>
+        <div class="mission-text">
+          <p>Overture is a diverse team of content creators working to create cool shit. In everything we do, we strive for diversity, equity and inclusion by creating spaces for everyone to thrive. We play hard, we fight hard, and we support one another.</p>
+          <p>Since 2021, <strong style="color:var(--txt)">we have raised over $36,000 for various non-profits around the world</strong> through our various tournaments and events. We are also proud to have been nominated in the <a href="https://gaymingmag.com/2022/12/gayming-awards-2023-nominees-revealed/" target="_blank" rel="noopener">2023 Gayming Awards</a> for "<strong style="color:var(--txt)">Best LGBTQ+ Contribution to Esports</strong>".</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charitable organisations -->
+    <p class="section-label">Organisations we've supported</p>
+    <div class="row g-3">
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Trans Women of Color Collective</div>
+          <div class="charity-link"><a href="https://www.twocc.us" target="_blank" rel="noopener">twocc.us</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Starlight Children's Foundation</div>
+          <div class="charity-link"><a href="https://www.starlight.org" target="_blank" rel="noopener">starlight.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Color of Change</div>
+          <div class="charity-link"><a href="https://colorofchange.org" target="_blank" rel="noopener">colorofchange.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">LGBTQ Fund</div>
+          <div class="charity-link"><a href="https://www.lgbtqfund.org" target="_blank" rel="noopener">lgbtqfund.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Rainbow Railroad</div>
+          <div class="charity-link"><a href="https://www.rainbowrailroad.org" target="_blank" rel="noopener">rainbowrailroad.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">The Trevor Project</div>
+          <div class="charity-link"><a href="https://www.thetrevorproject.org" target="_blank" rel="noopener">thetrevorproject.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">The Marsha P. Johnson Institute</div>
+          <div class="charity-link"><a href="https://marshap.org/" target="_blank" rel="noopener">marshap.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Games and Online Harassment Hotline</div>
+          <div class="charity-link"><a href="https://gameshotline.org" target="_blank" rel="noopener">gameshotline.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">National Black Trans Advocacy Coalition</div>
+          <div class="charity-link"><a href="https://blacktrans.org/" target="_blank" rel="noopener">blacktrans.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Trans Justice Funding Project</div>
+          <div class="charity-link"><a href="https://www.transjusticefundingproject.org" target="_blank" rel="noopener">transjusticefundingproject.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Transgender Law Center</div>
+          <div class="charity-link"><a href="https://transgenderlawcenter.org" target="_blank" rel="noopener">transgenderlawcenter.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Make-A-Wish</div>
+          <div class="charity-link"><a href="https://wish.org" target="_blank" rel="noopener">wish.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">The Ali Forney Center</div>
+          <div class="charity-link"><a href="https://www.aliforneycenter.org" target="_blank" rel="noopener">aliforneycenter.org</a></div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-4">
+        <div class="charity-card">
+          <div class="charity-name">Stream for a Cause</div>
+          <div class="charity-link"><a href="https://streamforacause.org" target="_blank" rel="noopener">streamforacause.org</a></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="ov-footer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/layout.js"></script>
+</body>
+</html>
