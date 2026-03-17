@@ -12,7 +12,6 @@
 }
 
 html, body {
-  height: 100%;
   background: var(--dark);
   color: var(--txt);
   font-family: 'Barlow', sans-serif;
@@ -134,5 +133,4 @@ html, body {
 /* ── Utilities ──────────────────────────────────────────────────── */
 a { color: var(--p); }
 a:hover { color: var(--p2); }
-.text-muted-ov { color: var(--mut) !important; }
 .accent { color: var(--p); }
